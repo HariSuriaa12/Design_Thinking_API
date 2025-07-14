@@ -8,6 +8,8 @@ COPY . .
 # Restore dependencies
 RUN dotnet restore
 
+ENV ASPNETCORE_ENVIRONMENT=Production
+
 # Build and publish
 RUN dotnet publish -c Release -o out
 
