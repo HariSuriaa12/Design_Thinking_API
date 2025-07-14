@@ -15,6 +15,7 @@ builder.Services.AddCors(options =>
     });
 });
 
+builder.WebHost.UseUrls($"http://*:{Environment.GetEnvironmentVariable("PORT")}");
 builder.Services.AddDbContext<Connection>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DBConnString"))); //To use actual database
 builder.Services.AddControllers();
 
