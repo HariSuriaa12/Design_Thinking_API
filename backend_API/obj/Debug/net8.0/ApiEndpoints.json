@@ -1,0 +1,34 @@
+[
+  {
+    "ContainingType": "backend_API.Controller.UsersController.GetUsers",
+    "Method": "Get",
+    "RelativePath": "api/GetUsers/{username}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "username",
+        "Type": "System.String",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend_API.Controller.UsersController.InsertUsers",
+    "Method": "AddOffers",
+    "RelativePath": "api/InsertUsers",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "usersDTO",
+        "Type": "backend_API.Model.DTO.UsersDTO",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
