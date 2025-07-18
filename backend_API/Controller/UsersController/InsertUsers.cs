@@ -20,7 +20,7 @@ namespace backend_API.Controller.UsersController
         }
 
         [HttpPost]
-        public IActionResult AddOffers([FromBody] UsersDTO usersDTO)
+        public IActionResult AddUsers([FromBody] UsersDTO usersDTO)
         {
             Users insertUsers = new Users()
             {
@@ -42,39 +42,42 @@ namespace backend_API.Controller.UsersController
                 created_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
             };
 
-            StringBuilder s = new StringBuilder();
-            PropertyInfo[] propertyInfos = insertUsers.GetType().GetProperties();
+            //StringBuilder s = new StringBuilder();
+            //PropertyInfo[] propertyInfos = insertUsers.GetType().GetProperties();
 
-            s.AppendLine($"Insert into \"Users\" ({String.Join(',', propertyInfos.Where(x => x.Name != "id").Select(x => x.Name).ToArray())})");
-            s.AppendLine("VALUES");
-            s.AppendLine("(");
+            //s.AppendLine($"Insert into \"Users\" ({String.Join(',', propertyInfos.Where(x => x.Name != "id").Select(x => x.Name).ToArray())})");
+            //s.AppendLine("VALUES");
+            //s.AppendLine("(");
 
-            List<NpgsqlParameter> DBParamList = new List<NpgsqlParameter>();
-            int i = 1;
+            //List<NpgsqlParameter> DBParamList = new List<NpgsqlParameter>();
+            //int i = 1;
 
             try
             {
-                foreach (PropertyInfo propertyInfo in propertyInfos)
-                {
-                    if (propertyInfo.Name == "id")
-                        continue;
+                conn.Users.Add(insertUsers);
+                conn.SaveChanges();
 
-                    if (i == propertyInfos.Count() - 1)
-                        s.AppendLine($"@{i}");
-                    else
-                        s.AppendLine($"@{i},");
+                //foreach (PropertyInfo propertyInfo in propertyInfos)
+                //{
+                //    if (propertyInfo.Name == "id")
+                //        continue;
 
-                    var value = propertyInfo.GetValue(insertUsers) ?? DBNull.Value; ;
-                    DBParamList.Add(new NpgsqlParameter($"@{i}", value));
+                //    if (i == propertyInfos.Count() - 1)
+                //        s.AppendLine($"@{i}");
+                //    else
+                //        s.AppendLine($"@{i},");
 
-                    i++;
-                }
+                //    var value = propertyInfo.GetValue(insertUsers) ?? DBNull.Value; ;
+                //    DBParamList.Add(new NpgsqlParameter($"@{i}", value));
 
-                s.AppendLine(")");
+                //    i++;
+                //}
 
-                string query = s.ToString();
+                //s.AppendLine(")");
 
-                conn.SQL_Command_Execute(query, DBParamList);
+                //string query = s.ToString();
+
+                //conn.SQL_Command_Execute(query, DBParamList);
 
                 MainModel main = new MainModel
                 {
@@ -87,10 +90,12 @@ namespace backend_API.Controller.UsersController
             }
             catch (Exception ex)
             {
+                string errMsg = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+
                 MainModel main = new MainModel
                 {
                     success = false,
-                    message = ex.Message,
+                    message = errMsg,
                     data = new Users()
                 };
 

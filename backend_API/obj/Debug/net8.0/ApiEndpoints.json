@@ -17,7 +17,7 @@
   },
   {
     "ContainingType": "backend_API.Controller.UsersController.InsertUsers",
-    "Method": "AddOffers",
+    "Method": "AddUsers",
     "RelativePath": "api/InsertUsers",
     "HttpMethod": "POST",
     "IsController": true,

@@ -15,10 +15,11 @@ namespace backend_API.Controller.UsersController
             this.conn = conn;
         }
 
-        [HttpPut("UpdateAverageRating/{id}")]
-        public IActionResult UpdateUserRating(long id, [FromBody] UserRatingDTO userRatingDTO)
+        [HttpPut("UpdateAverageRating/{id}/{swap_offer_id}")]
+        public IActionResult UpdateUserRating(long id, long swap_offer_id, [FromBody] UserRatingDTO userRatingDTO)
         {
             var users = conn.Users.Find(id);
+            var swap_offer = conn.swap_offers.Find(swap_offer_id);
 
             try
             {
@@ -36,6 +37,8 @@ namespace backend_API.Controller.UsersController
 
                     users.average_rating = display_upscaled_rating;
                     users.total_user_rated = fetched_current_total_user_rating_from_DB + 1;
+
+                    swap_offer.isRated = 1;
 
                     conn.SaveChanges();
 

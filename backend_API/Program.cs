@@ -15,8 +15,8 @@ builder.Services.AddCors(options =>
     });
 });
 
-var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
-builder.WebHost.UseUrls($"http://*:{port}");
+//var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+//builder.WebHost.UseUrls($"http://*:{port}");
 builder.Services.AddDbContext<Connection>(opt => opt.UseNpgsql(builder.Configuration.GetConnectionString("DBConnString"))); //To use actual database
 builder.Services.AddControllers();
 
@@ -26,5 +26,13 @@ var app = builder.Build();
 
 //app.UseCors("AllowReactApp");
 app.MapControllers();
-app.Run();
-//app.Run("http://0.0.0.0:7283"); //To allow run on android studio
+
+bool runAppTest = true;
+if (!runAppTest)
+{
+    app.Run();
+}
+else
+{
+    app.Run("http://0.0.0.0:7283"); //To allow run on android studio
+}

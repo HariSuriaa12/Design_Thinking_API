@@ -41,6 +41,8 @@ namespace backend_API.Controller.UsersController
                                 additional_info = s.additional_info,
                                 accepted_user_id = s.accepted_user_id,
                                 created_at = s.created_at,
+                                isConfirmed = s.isConfirmed,
+                                isRated = s.isRated,
                                 user = u // ✅ assign user manually
                             })
                         .ToList();
@@ -82,6 +84,8 @@ namespace backend_API.Controller.UsersController
                                 additional_info = s.additional_info,
                                 accepted_user_id = s.accepted_user_id,
                                 created_at = s.created_at,
+                                isConfirmed = s.isConfirmed,
+                                isRated = s.isRated,
                                 user = u // ✅ assign user manually
                             })
                         .ToList();
@@ -141,9 +145,121 @@ namespace backend_API.Controller.UsersController
                                 additional_info = s.additional_info,
                                 accepted_user_id = s.accepted_user_id,
                                 created_at = s.created_at,
+                                isConfirmed = s.isConfirmed,
+                                isRated = s.isRated,
                                 user = u // ✅ assign user manually
                             })
                         .ToList();
+
+            if (retrieved_Swap_offers != null)
+            {
+                MainModel main = new MainModel
+                {
+                    success = true,
+                    message = $"Success",
+                    data = retrieved_Swap_offers
+                };
+
+                return Ok(main);
+            }
+            else
+            {
+                MainModel main = new MainModel
+                {
+                    success = false,
+                    message = $"Offer {id} not found",
+                    data = new swap_offer()
+                };
+
+                return NotFound(main);
+            }
+        }
+
+        [HttpGet("GetMyOffer/{id?}")]
+        public IActionResult GetMyOffers(long? id)
+        {
+            var retrieved_Swap_offers = conn.swap_offers
+                                        .Where(s => s.user_id == id)
+                                        .GroupJoin(conn.Users,
+                                            s => s.accepted_user_id,
+                                            u => u.id,
+                                            (s, userGroup) => new { s, userGroup }) // group for left join
+                                        .SelectMany(
+                                            temp => temp.userGroup.DefaultIfEmpty(), // ensures null user is still included
+                                            (temp, u) => new swap_offerDTO
+                                            {
+                                                id = temp.s.id,
+                                                item_name = temp.s.item_name,
+                                                item_description = temp.s.item_description,
+                                                user_id = temp.s.user_id,
+                                                item_image = temp.s.item_image,
+                                                meetup_location = temp.s.meetup_location,
+                                                in_return_item_request = temp.s.in_return_item_request,
+                                                swap_period = temp.s.swap_period,
+                                                request_expiry_date = temp.s.request_expiry_date,
+                                                additional_info = temp.s.additional_info,
+                                                accepted_user_id = temp.s.accepted_user_id,
+                                                created_at = temp.s.created_at,
+                                                isConfirmed = temp.s.isConfirmed,
+                                                isRated = temp.s.isRated,
+                                                user = u ?? new Users() // this now safely applies
+                                            })
+                                        .ToList();
+
+            if (retrieved_Swap_offers != null)
+            {
+                MainModel main = new MainModel
+                {
+                    success = true,
+                    message = $"Success",
+                    data = retrieved_Swap_offers
+                };
+
+                return Ok(main);
+            }
+            else
+            {
+                MainModel main = new MainModel
+                {
+                    success = false,
+                    message = $"Offer {id} not found",
+                    data = new swap_offer()
+                };
+
+                return NotFound(main);
+            }
+        }
+
+        [HttpGet("GetMyOfferbyId/{id?}")]
+        public IActionResult GetMyOffersBasedOnID(long? id)
+        {
+            var retrieved_Swap_offers = conn.swap_offers
+                                        .Where(s => s.id == id)
+                                        .GroupJoin(conn.Users,
+                                            s => s.accepted_user_id,
+                                            u => u.id,
+                                            (s, userGroup) => new { s, userGroup }) // group for left join
+                                        .SelectMany(
+                                            temp => temp.userGroup.DefaultIfEmpty(), // ensures null user is still included
+                                            (temp, u) => new swap_offerDTO
+                                            {
+                                                id = temp.s.id,
+                                                item_name = temp.s.item_name,
+                                                item_description = temp.s.item_description,
+                                                user_id = temp.s.user_id,
+                                                item_image = temp.s.item_image,
+                                                meetup_location = temp.s.meetup_location,
+                                                in_return_item_request = temp.s.in_return_item_request,
+                                                swap_period = temp.s.swap_period,
+                                                request_expiry_date = temp.s.request_expiry_date,
+                                                additional_info = temp.s.additional_info,
+                                                accepted_user_id = temp.s.accepted_user_id,
+                                                created_at = temp.s.created_at,
+                                                isConfirmed = temp.s.isConfirmed,
+                                                isRated = temp.s.isRated,
+                                                user = u ?? new Users() // this now safely applies
+                                            })
+                                        .ToList();
 
             if (retrieved_Swap_offers != null)
             {
@@ -191,6 +307,8 @@ namespace backend_API.Controller.UsersController
                                 additional_info = s.additional_info,
                                 accepted_user_id = s.accepted_user_id,
                                 created_at = s.created_at,
+                                isConfirmed = s.isConfirmed,
+                                isRated = s.isRated,
                                 user = u // ✅ assign user manually
                             })
                         .ToList();
@@ -238,39 +356,44 @@ namespace backend_API.Controller.UsersController
                 created_at = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")
             };
 
-            StringBuilder s = new StringBuilder();
-            PropertyInfo[] propertyInfos = swap_offer.GetType().GetProperties();
+            try 
+            { 
+                conn.swap_offers.Add(swap_offer);
+                conn.SaveChanges();
 
-            s.AppendLine($"Insert into swap_offers ({String.Join(',', propertyInfos.Where(x => (x.Name != "id" && x.Name != "user")).Select(x => x.Name).ToArray())})");
-            s.AppendLine("VALUES");
-            s.AppendLine("(");
+                //StringBuilder s = new StringBuilder();
+                //PropertyInfo[] propertyInfos = swap_offer.GetType().GetProperties();
 
-            List<NpgsqlParameter> DBParamList = new List<NpgsqlParameter>();
-            int i = 1;
+                //s.AppendLine($"Insert into swap_offers ({String.Join(',', propertyInfos.Where(x => (x.Name != "id" && x.Name != "user")).Select(x => x.Name).ToArray())})");
+                //s.AppendLine("VALUES");
+                //s.AppendLine("(");
 
-            try
-            {
+                //List<NpgsqlParameter> DBParamList = new List<NpgsqlParameter>();
+                //int i = 1;
 
-                foreach (PropertyInfo propertyInfo in propertyInfos)
-                {
-                    if (propertyInfo.Name == "id" || propertyInfo.Name == "user")
-                        continue;
+                //try
+                //{
 
-                    if (i == propertyInfos.Count() - 2)
-                        s.AppendLine($"@{i}");
-                    else
-                        s.AppendLine($"@{i},");
+                //    foreach (PropertyInfo propertyInfo in propertyInfos)
+                //    {
+                //        if (propertyInfo.Name == "id" || propertyInfo.Name == "user")
+                //            continue;
 
-                    var value = propertyInfo.GetValue(swap_offer) ?? DBNull.Value;
-                    DBParamList.Add(new NpgsqlParameter($"@{i}", value));
+                //        if (i == propertyInfos.Count() - 2)
+                //            s.AppendLine($"@{i}");
+                //        else
+                //            s.AppendLine($"@{i},");
 
-                    i++;
-                }
+                //        var value = propertyInfo.GetValue(swap_offer) ?? DBNull.Value;
+                //        DBParamList.Add(new NpgsqlParameter($"@{i}", value));
 
-                s.AppendLine(")");
-                string query = s.ToString();
+                //        i++;
+                //    }
 
-                conn.SQL_Command_Execute(query, DBParamList);
+                //    s.AppendLine(")");
+                //    string query = s.ToString();
+
+                //    conn.SQL_Command_Execute(query, DBParamList);
 
                 MainModel main = new MainModel
                 {
