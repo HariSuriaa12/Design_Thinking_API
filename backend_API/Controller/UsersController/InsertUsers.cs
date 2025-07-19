@@ -24,7 +24,7 @@ namespace backend_API.Controller.UsersController
         {
             Users insertUsers = new Users()
             {
-                id = usersDTO.id,
+                //id = usersDTO.id,
                 full_name = usersDTO.full_name,
                 nick_name = usersDTO.nick_name,
                 ic = usersDTO.ic,

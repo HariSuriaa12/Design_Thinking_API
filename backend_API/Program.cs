@@ -27,7 +27,7 @@ var app = builder.Build();
 //app.UseCors("AllowReactApp");
 app.MapControllers();
 
-bool runAppTest = true;
+bool runAppTest = false;
 if (!runAppTest)
 {
     app.Run();
